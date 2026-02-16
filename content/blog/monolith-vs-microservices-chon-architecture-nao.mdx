@@ -1,0 +1,1017 @@
+---
+title: "Monolith vs Microservices: Chọn Architecture Nào Cho Dự Án Của Bạn?"
+description: "So sánh chi tiết Monolith và Microservices architecture: trade-offs, khi nào nên dùng, real-world examples, và common mistakes. Học cách đưa ra architecture decisions đúng đắn dựa trên scale và context."
+date: "2025-01-18"
+slug: "monolith-vs-microservices-chon-architecture-nao"
+cover: ""
+category: "Architecture Patterns"
+keywords: ["monolith vs microservices", "microservices là gì", "monolith architecture", "khi nào dùng microservices", "architecture decision", "distributed systems"]
+---
+
+# Monolith vs Microservices: Chọn Architecture Nào?
+
+Tôi còn nhớ cuộc họp architecture review đầu tiên tôi tham gia.
+
+Junior engineer present: *"Em suggest dùng microservices cho project mới."*
+
+CTO hỏi: *"Tại sao?"*
+
+Junior: *"Vì... microservices là best practice ạ. Netflix dùng, Uber dùng, nên em nghĩ chúng ta cũng nên dùng."*
+
+CTO: *"Project này có 500 users, team 3 người. Netflix có 200 triệu users và 1000 engineers. Em nghĩ context có giống nhau không?"*
+
+Silence.
+
+CTO: *"Microservices không phải 'best practice'. Đó là trade-off. Với context của chúng ta, monolith đơn giản sẽ tốt hơn nhiều."*
+
+**Đó là lần tôi học: Architecture decisions phải based on context, not trends.**
+
+## Monolith vs Microservices: Định Nghĩa
+
+### Monolith Architecture
+
+**Monolith = Toàn bộ application trong một codebase, deploy cùng nhau**
+```
+Single application containing:
+- User management
+- Order processing  
+- Payment handling
+- Notification system
+- Inventory management
+- All in one codebase
+- Deploy as single unit
+```
+
+**Characteristics:**
+```
+✓ Single codebase
+✓ Single deployment
+✓ Single database (thường)
+✓ Tightly coupled components
+✓ Shared memory space
+✓ Single technology stack
+```
+
+### Microservices Architecture
+
+**Microservices = Application chia thành nhiều services nhỏ, độc lập**
+```
+Multiple independent services:
+- User Service
+- Order Service
+- Payment Service
+- Notification Service
+- Inventory Service
+
+Each service:
+- Own codebase
+- Own database
+- Own deployment
+- Communicate via API/messaging
+```
+
+**Characteristics:**
+```
+✓ Multiple codebases
+✓ Independent deployment
+✓ Decentralized data (database per service)
+✓ Loosely coupled
+✓ Separate processes
+✓ Polyglot (multiple tech stacks possible)
+```
+
+### Visual Comparison
+```
+Monolith:
+┌─────────────────────────────────┐
+│     Single Application          │
+│  ┌─────────┬─────────┬────────┐ │
+│  │ Users   │ Orders  │Payment │ │
+│  ├─────────┼─────────┼────────┤ │
+│  │Inventory│ Notif   │ ...    │ │
+│  └─────────┴─────────┴────────┘ │
+│                                 │
+│      Single Database            │
+└─────────────────────────────────┘
+
+Microservices:
+┌──────────┐  ┌──────────┐  ┌──────────┐
+│  User    │  │  Order   │  │ Payment  │
+│ Service  │  │ Service  │  │ Service  │
+├──────────┤  ├──────────┤  ├──────────┤
+│User DB   │  │Order DB  │  │Payment DB│
+└──────────┘  └──────────┘  └──────────┘
+     ↕            ↕             ↕
+        API / Message Queue
+```
+
+*Monolith = một khối, Microservices = nhiều services độc lập*
+
+## Tại Sao Có Hai Approaches?
+
+### Problem Monolith Giải Quyết
+
+**Simplicity in early stage**
+```
+Startup challenges:
+- Unclear product-market fit
+- Need to pivot quickly
+- Small team (2-5 developers)
+- Limited budget
+- Need to ship fast
+
+Monolith advantages:
+✓ Simple to develop (one codebase)
+✓ Simple to deploy (one app)
+✓ Simple to test (no network issues)
+✓ Simple to debug (one process)
+✓ Fast iteration
+
+→ Perfect cho early stage
+```
+
+### Problem Microservices Giải Quyết
+
+**Scale and team organization at large scale**
+```
+Large company challenges:
+- 100+ engineers
+- Multiple teams
+- Different scaling needs per feature
+- Need independent deployments
+- Technology diversity needed
+
+Microservices advantages:
+✓ Team autonomy (own service)
+✓ Independent scaling (scale what's needed)
+✓ Independent deployment (no coordination)
+✓ Technology flexibility (best tool per service)
+✓ Fault isolation (one service down ≠ all down)
+
+→ Necessary cho large scale
+```
+
+## Monolith Architecture: Deep Dive
+
+### Ưu Điểm
+
+**1. Simplicity**
+```
+Development:
+- Single codebase → Easy to navigate
+- No network calls → No latency/failures
+- Shared code → Easy reuse
+- IDE works well → Autocomplete, refactoring
+
+Deployment:
+- Single artifact → Deploy once
+- No orchestration needed → Simple CI/CD
+- No service discovery → No complexity
+
+Testing:
+- Integration tests easy → All in one process
+- No mocking network calls → Real tests
+- End-to-end tests simple → Single app
+```
+
+**2. Performance**
+```
+No network overhead:
+- Function calls: nanoseconds
+- Network calls: milliseconds
+- 1,000,000x faster!
+
+Example:
+Monolith: getUserOrders()
+→ Direct function call (1 microsecond)
+
+Microservices: HTTP GET /users/{id}/orders
+→ Network call (10 milliseconds)
+→ 10,000x slower!
+
+For chatty communications, monolith wins
+```
+
+**3. Transactions**
+```
+ACID transactions work:
+
+Monolith:
+BEGIN TRANSACTION
+  INSERT INTO orders ...
+  UPDATE inventory ...
+  INSERT INTO payments ...
+COMMIT
+
+→ All or nothing
+→ Database guarantees consistency
+
+Microservices:
+Order Service: Create order ✓
+Inventory Service: Update inventory ✗ (network fail)
+Payment Service: Never called
+
+→ Partial failure
+→ Need distributed transaction (complex!)
+```
+
+**4. Low Operational Overhead**
+```
+Operations needed:
+- Monitor: 1 application
+- Deploy: 1 artifact
+- Scale: 1 type of server
+- Debug: 1 log file
+- Backup: 1 database
+
+vs Microservices:
+- Monitor: 10 applications
+- Deploy: 10 artifacts (coordination!)
+- Scale: 10 different types
+- Debug: 10 log sources (correlation!)
+- Backup: 10 databases
+```
+
+### Nhược Điểm
+
+**1. Scaling Limitations**
+```
+Problem: Must scale entire application
+
+Example:
+Order processing: Needs 10 servers (CPU intensive)
+User management: Needs 1 server (light load)
+
+Monolith: Must run 10 identical servers
+→ 9 servers wasting resources on user management
+→ Expensive!
+
+Microservices: Scale independently
+→ 10 order servers
+→ 1 user server
+→ Cost-effective
+```
+
+**2. Deployment Risk**
+```
+Problem: Any change = redeploy everything
+
+Small bug fix in notifications:
+→ Must redeploy entire application
+→ Risk breaking orders, payments, etc.
+→ All or nothing deployment
+
+Microservices:
+→ Deploy only notification service
+→ Other services unaffected
+→ Lower risk
+```
+
+**3. Technology Lock-in**
+```
+Problem: Stuck with initial choices
+
+Started with Python:
+→ All code must be Python
+→ Cannot use Go for CPU-intensive tasks
+→ Cannot use Node.js for real-time features
+→ Forced to optimize Python (expensive)
+
+Microservices:
+→ Payment service: Java (enterprise libraries)
+→ Real-time service: Node.js (WebSocket)
+→ ML service: Python (ML libraries)
+→ Best tool for each job
+```
+
+**4. Large Team Challenges**
+```
+Problem: 50 engineers, one codebase
+
+Challenges:
+- Merge conflicts daily
+- Long CI/CD (test everything)
+- Unclear ownership (who owns what?)
+- Hard to parallelize work
+- Stepping on each other's toes
+
+Microservices:
+- Team A owns User Service (isolated)
+- Team B owns Order Service (isolated)
+- No conflicts
+- Independent work
+```
+
+## Microservices Architecture: Deep Dive
+
+### Ưu Điểm
+
+**1. Independent Scalability**
+```
+Real example:
+Black Friday sale
+
+Traffic pattern:
+- Order Service: 10,000 req/s (10x normal)
+- User Service: 1,000 req/s (normal)
+- Payment Service: 5,000 req/s (5x normal)
+
+Microservices: Scale precisely
+→ Order: 50 instances
+→ User: 5 instances
+→ Payment: 25 instances
+→ Total cost: Optimized
+
+Monolith: Scale everything
+→ 50 instances of entire app
+→ User service over-provisioned
+→ Waste money
+```
+
+**2. Team Autonomy**
+```
+Team structure:
+Team A (User Service):
+- Own codebase
+- Own database
+- Own deployment
+- Own technology choices
+- Ship independently
+
+Team B (Order Service):
+- Same autonomy
+- No coordination needed
+- Different release cycle
+- Different tech stack OK
+
+→ Teams move fast independently
+```
+
+**3. Fault Isolation**
+```
+Monolith failure:
+Notification service bug → Crashes entire app
+→ Orders down
+→ Payments down
+→ Everything down
+
+Microservices failure:
+Notification service crashes:
+→ Orders: Still working ✓
+→ Payments: Still working ✓
+→ Users: Still working ✓
+→ Notifications: Degraded (queue for later)
+
+→ Graceful degradation
+→ Better availability
+```
+
+**4. Technology Flexibility**
+```
+Choose best tool per service:
+
+User Service: Ruby on Rails
+→ Fast development
+→ CRUD operations
+
+Payment Service: Java
+→ Enterprise libraries
+→ Strong typing
+→ Battle-tested
+
+Recommendation Service: Python
+→ ML libraries
+→ Data science tools
+
+Real-time Chat: Node.js
+→ WebSocket support
+→ Event-driven
+
+→ Right tool for right job
+```
+
+### Nhược Điểm
+
+**1. Extreme Complexity**
+```
+Distributed systems challenges:
+
+Network failures:
+- Service A calls Service B → Timeout
+- Retry? Circuit breaker? Fallback?
+- Need sophisticated error handling
+
+Data consistency:
+- No ACID transactions across services
+- Eventual consistency
+- Saga pattern / 2-phase commit (complex!)
+
+Service discovery:
+- How does Service A find Service B?
+- Load balancing between instances
+- Health checks
+
+Monitoring:
+- Distributed tracing
+- Log aggregation
+- Correlation IDs across services
+
+→ Much more complexity than monolith
+```
+
+**2. Network Latency & Failures**
+```
+Monolith:
+getUser() → getOrders() → getPayments()
+→ 3 function calls (microseconds)
+→ Never fails
+
+Microservices:
+HTTP GET /users/{id}
+→ HTTP GET /orders?userId={id}
+→ HTTP GET /payments?orderId={id}
+→ 3 network calls (10ms each + failures possible)
+
+Problems:
+- 30ms+ latency
+- Any call can fail (network issues)
+- Need timeouts, retries, circuit breakers
+- Cascading failures possible
+```
+
+**3. Testing Complexity**
+```
+Monolith testing:
+- Unit tests: Easy
+- Integration tests: Run app, test
+- End-to-end: Single app
+- CI/CD: Fast (one build)
+
+Microservices testing:
+- Unit tests: Same
+- Integration tests: Need mock services OR run all services
+- End-to-end: Need entire ecosystem running
+- CI/CD: Coordinate multiple deployments
+
+Contract testing needed:
+- Service A expects Service B API v1
+- Service B deploys v2 → Breaks Service A!
+- Need versioning, backwards compatibility
+```
+
+**4. Operational Overhead**
+```
+For 10 microservices:
+
+Infrastructure:
+- 10 deployment pipelines
+- 10 monitoring dashboards
+- 10 log streams (need aggregation)
+- 10 databases (need backups)
+- Service mesh (Istio, Linkerd)
+- API gateway
+- Message queue
+
+Team needed:
+- DevOps engineers (manage infra)
+- SRE (reliability)
+- Platform team (tooling)
+- Security team (10 attack surfaces!)
+
+→ Only worth it at large scale
+```
+
+## The Trade-off Matrix
+```
+┌──────────────────┬────────────┬──────────────┐
+│                  │  Monolith  │Microservices │
+├──────────────────┼────────────┼──────────────┤
+│ Complexity       │   Simple   │   Complex    │
+│ Development      │    Fast    │    Slower    │
+│ Deployment       │   Simple   │   Complex    │
+│ Scaling          │  Limited   │  Flexible    │
+│ Performance      │    High    │    Lower     │
+│ Reliability      │  All/None  │   Isolated   │
+│ Team structure   │ Monolithic │  Autonomous  │
+│ Technology       │   Locked   │   Flexible   │
+│ Transactions     │    Easy    │     Hard     │
+│ Testing          │   Easier   │    Harder    │
+│ Operational cost │    Low     │     High     │
+└──────────────────┴────────────┴──────────────┘
+```
+
+## Khi Nào Dùng Monolith?
+
+### Use Cases Ideal Cho Monolith
+
+**1. Startup / MVP (0-10K users)**
+```
+Context:
+- Product-market fit chưa rõ
+- Team nhỏ (2-5 người)
+- Cần ship nhanh
+- Budget giới hạn
+- Có thể pivot
+
+Why monolith:
+✓ Ship trong 2-4 tuần (vs 3-6 tháng microservices)
+✓ Iterate nhanh (refactor dễ)
+✓ Cost $200/tháng (vs $2,000)
+✓ 1 person có thể maintain
+
+Example: Instagram early days
+- Started as monolith
+- Grew to 1M users
+- Only then started splitting services
+```
+
+**2. Small Team (< 10 developers)**
+```
+Team capacity:
+- Cannot maintain 10 microservices
+- Cannot handle distributed debugging
+- Cannot manage deployment complexity
+
+Monolith fit:
+✓ Everyone understands entire codebase
+✓ Easy to onboard new members
+✓ Simple deployment (one person can do)
+✓ Focus on features, not infrastructure
+```
+
+**3. CRUD Applications**
+```
+Application type:
+- Admin dashboard
+- Content management system
+- Internal tools
+- Simple web apps
+
+Characteristics:
+- Straightforward logic
+- No complex scaling needs
+- Standard operations (CRUD)
+- Few concurrent users
+
+Monolith perfect:
+✓ Rails/Django scaffolding
+✓ Fast development
+✓ No over-engineering
+```
+
+**4. Data-Intensive Applications**
+```
+Requirements:
+- Lots of JOINs across entities
+- Complex transactions
+- Data consistency critical
+- Reporting across entities
+
+Monolith wins:
+✓ Single database → Easy JOINs
+✓ ACID transactions work
+✓ No distributed data issues
+✓ Fast queries (no network hops)
+
+Example: Accounting software, ERP systems
+```
+
+## Khi Nào Dùng Microservices?
+
+### Use Cases Ideal Cho Microservices
+
+**1. Large Scale (1M+ users, 50+ engineers)**
+```
+Context:
+- Multiple product teams
+- Different features scale differently
+- Need rapid independent deployment
+- Complex domain
+
+Why microservices:
+✓ Team autonomy (ship independently)
+✓ Scale services independently
+✓ Avoid merge conflicts
+✓ Parallel development
+
+Example: Netflix, Uber, Airbnb
+- 100M+ users
+- 500+ engineers
+- Deploy 100+ times/day
+```
+
+**2. Different Scaling Requirements**
+```
+Real example (E-commerce):
+
+Service scaling needs:
+- Product catalog: 100 req/s (stable)
+- Search: 500 req/s (peaks during sale)
+- Checkout: 1,000 req/s (Black Friday 10x)
+- Recommendations: 10,000 req/s (ML expensive)
+
+Microservices:
+→ Checkout: 50 instances during peak
+→ Catalog: 5 instances always
+→ Search: Auto-scale 5-30 instances
+→ Recommendations: GPU instances
+
+Optimize cost AND performance
+```
+
+**3. Team Independence Needed**
+```
+Large organization:
+- 10 product teams
+- Each owns a domain (Users, Orders, Payments, etc.)
+- Need to ship independently
+- Different release cycles
+
+Microservices enable:
+✓ Team A ships User Service v2.0 (no coordination)
+✓ Team B still on Order Service v1.5 (own pace)
+✓ No blocking each other
+✓ Clear ownership
+
+Organizational pattern matches architecture
+```
+
+**4. Polyglot Requirements**
+```
+Different problems need different tools:
+
+Payment Processing:
+→ Java (enterprise, PCI compliance libraries)
+
+Real-time Chat:
+→ Node.js/Go (WebSocket, concurrent connections)
+
+Machine Learning:
+→ Python (TensorFlow, scikit-learn)
+
+Image Processing:
+→ C++/Rust (performance critical)
+
+Monolith: Stuck với một language
+Microservices: Best tool per service
+```
+
+## The Gray Area: Modular Monolith
+
+**Best of both worlds cho many cases**
+
+### Concept
+```
+Modular Monolith:
+- Single codebase/deployment (như monolith)
+- Clear module boundaries (như microservices)
+- Can extract to microservices later
+
+Structure:
+app/
+  modules/
+    users/
+      - controllers
+      - models
+      - services
+    orders/
+      - controllers
+      - models
+      - services
+    payments/
+      - controllers
+      - models
+      - services
+```
+
+### Benefits
+```
+✓ Simple deployment (one app)
+✓ Clear boundaries (easy to understand)
+✓ No network overhead (still function calls)
+✓ Easy to split later (when proven needed)
+✓ Team can own modules (ownership)
+
+Example: Shopify
+- Started monolith
+- Evolved to modular monolith
+- Extracted only critical services to microservices
+- Core still modular monolith
+```
+
+### When to Use
+```
+Sweet spot:
+- 10-50 engineers
+- 10K-1M users
+- Need organization but not complexity
+- Want option to scale later
+
+Better than:
+- Pure monolith (no structure)
+- Full microservices (over-engineered)
+```
+
+## Migration Path: Monolith → Microservices
+
+**Không nên big bang rewrite!**
+
+### Strangler Fig Pattern
+```
+Phase 1: Monolith (all features)
+├── Users
+├── Orders
+├── Payments
+└── Inventory
+
+Phase 2: Extract first service
+├── Monolith
+│   ├── Orders
+│   ├── Payments
+│   └── Inventory
+└── User Service (extracted)
+
+Phase 3: Extract more services
+├── Monolith
+│   └── Inventory
+├── User Service
+├── Order Service
+└── Payment Service
+
+Phase 4: Microservices (when needed)
+├── User Service
+├── Order Service
+├── Payment Service
+└── Inventory Service
+```
+
+### Extraction Criteria
+```
+Extract when:
+✓ Service has different scaling needs
+✓ Service is stable (won't change often)
+✓ Clear boundaries exist
+✓ Team can own it independently
+✓ Worth the operational overhead
+
+Don't extract:
+✗ Just because "microservices are cool"
+✗ Without operational maturity
+✗ If tightly coupled to other parts
+✗ If no team to own it
+```
+
+## Common Mistakes
+
+### Mistake 1: Premature Microservices
+```
+❌ Bad:
+"We're building a startup. Let's use microservices
+ from day 1 because that's what big companies do!"
+
+Reality:
+- 6 months building infrastructure
+- 3 engineers overwhelmed
+- $5K/month burn rate
+- Haven't proven product-market fit
+- Run out of money before launch
+
+✅ Good:
+"Start with monolith. Ship in 1 month.
+ Find product-market fit first.
+ Extract to microservices when proven necessary."
+```
+
+### Mistake 2: Too Many Microservices
+```
+❌ Bad:
+20 microservices for 5K users
+
+Problems:
+- 20 deployment pipelines
+- 20 monitoring dashboards
+- Distributed debugging nightmare
+- Team of 5 cannot maintain
+
+✅ Good:
+Start with 3-5 services max
+Only add when PROVEN needed
+Quality > Quantity
+```
+
+### Mistake 3: Wrong Boundaries
+```
+❌ Bad boundaries:
+- getUserName() → User Service (network call!)
+- getOrderItems() → Order Service
+- calculateTotal() → Payment Service
+
+→ Chatty communication
+→ 100+ network calls per request
+→ Slow and fragile
+
+✅ Good boundaries:
+- createOrder(userId, items) → Order Service
+  → Internally calls User, Payment, Inventory
+  → Returns complete order
+→ Coarse-grained APIs
+→ Fewer network calls
+```
+
+### Mistake 4: Ignoring Operational Complexity
+```
+❌ Bad:
+Build microservices
+No:
+- Monitoring
+- Distributed tracing
+- Log aggregation
+- Service mesh
+- DevOps team
+
+→ Production nightmare
+→ Cannot debug issues
+→ Downtime frequent
+
+✅ Good:
+Microservices = Investment in operations
+- Hire DevOps/SRE
+- Setup observability FIRST
+- Implement patterns (circuit breaker, etc.)
+- Then extract services
+```
+
+## Decision Framework
+
+### Questions to Ask
+```
+1. Team size?
+   < 10 engineers → Monolith
+   10-50 engineers → Modular Monolith
+   50+ engineers → Consider Microservices
+
+2. Current scale?
+   < 10K users → Monolith
+   10K-1M users → Monolith or Modular
+   1M+ users → Evaluate per service
+
+3. Scaling pattern?
+   Uniform load → Monolith fine
+   Different per feature → Microservices help
+
+4. Team structure?
+   Single team → Monolith
+   Multiple autonomous teams → Microservices
+
+5. Deployment frequency?
+   Weekly → Monolith OK
+   Daily → Modular Monolith
+   Hourly/Continuous → Microservices
+
+6. Operational maturity?
+   Basic → Monolith
+   Intermediate → Modular
+   Advanced → Microservices
+
+7. Technology diversity needed?
+   No → Monolith
+   Yes → Microservices
+```
+
+### Decision Tree
+```
+Start Here
+   ↓
+Are you a startup/MVP?
+   Yes → Monolith
+   No ↓
+   
+Do you have < 20 engineers?
+   Yes → Modular Monolith
+   No ↓
+   
+Different scaling per feature?
+   No → Modular Monolith
+   Yes ↓
+   
+Have DevOps/SRE team?
+   No → Modular Monolith (not ready)
+   Yes ↓
+   
+Multiple autonomous teams?
+   No → Modular Monolith
+   Yes → Consider Microservices
+```
+
+## Key Takeaways
+
+**Architecture is trade-offs, not dogma**
+```
+Monolith ≠ Bad
+Microservices ≠ Good
+
+Right choice depends on:
+- Scale
+- Team size
+- Organizational structure
+- Operational maturity
+```
+
+**Monolith best for:**
+```
+✓ Startups (ship fast)
+✓ Small teams (< 10 engineers)
+✓ Simple domains
+✓ Tight consistency needs
+✓ Limited operational capability
+```
+
+**Microservices best for:**
+```
+✓ Large scale (1M+ users)
+✓ Large teams (50+ engineers)
+✓ Independent scaling needs
+✓ Team autonomy important
+✓ Strong DevOps capability
+```
+
+**The middle ground:**
+```
+Modular Monolith:
+- Structure of microservices
+- Simplicity of monolith
+- Can evolve to microservices
+- Sweet spot for many companies
+```
+
+**Evolution path:**
+```
+1. Start: Monolith
+2. Grow: Modular Monolith
+3. Scale: Selective Microservices
+4. Massive scale: Full Microservices
+
+Evolve architecture với business
+Don't over-engineer early
+```
+
+**Common mistakes:**
+```
+✗ Premature microservices (over-engineering)
+✗ Too many services (operational nightmare)
+✗ Wrong boundaries (chatty communication)
+✗ Ignore operational needs (production pain)
+
+✓ Start simple
+✓ Extract when proven needed
+✓ Invest in operations first
+✓ Follow organizational structure
+```
+
+**Remember:**
+```
+Conway's Law:
+"Architecture mirrors organization structure"
+
+Small team → Monolith
+Large org with teams → Microservices
+
+Architecture decision = Business decision
+Not just technical decision
+
+Choose based on context, not hype
+```
+
+## Next Steps
+
+**If choosing monolith:**
+- Design clear modules
+- Keep components loosely coupled
+- Plan for future extraction
+- Monitor for bottlenecks
+
+**If choosing microservices:**
+- Start with 3-5 services max
+- Invest in DevOps/observability
+- Define clear service boundaries
+- Implement resilience patterns
+
+**If migrating:**
+- Strangler Fig pattern (gradual)
+- Extract most valuable service first
+- Don't big bang rewrite
+- Measure success before continuing
+
+**Most important:**
+```
+There's no "best" architecture
+Only architecture that fits YOUR context
+
+Start simple
+Measure continuously
+Evolve intelligently
+```
+
+---
+
+*Bài viết này là phần của System Design From Zero to Hero - Learn architecture decisions from first principles.*

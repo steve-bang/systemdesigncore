@@ -12,12 +12,14 @@ import type { Route } from "next";
 export const routes = {
   roadmap: "/roadmap" as Route,
   docs: "/docs/getting-started" as Route,
+  blog: "/blog" as Route,
   about: "/about" as Route
 };
 
 const navItems = [
   { href: routes.roadmap, label: "Roadmap" },
   { href: routes.docs, label: "Docs" },
+  { href: routes.blog, label: "Blog" },
   { href: routes.about, label: "About" }
 ];
 
