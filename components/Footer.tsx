@@ -13,7 +13,7 @@ export function Footer() {
           <Link href="/docs/getting-started" className="hover:text-ink">
             Docs
           </Link>
-          <Link href="https://github.com" className="hover:text-ink">
+          <Link href="https://github.com/steve-bang" className="hover:text-ink">
             GitHub
           </Link>
         </div>
