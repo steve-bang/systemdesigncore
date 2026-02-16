@@ -1,0 +1,277 @@
+---
+title: "Interview Preparation"
+description: "Hướng dẫn chuẩn bị System Design Interview theo chuẩn công ty lớn: framework tư duy, quy trình trả lời, chiến lược luyện tập và các lỗi cần tránh."
+---
+
+# System Design Interview Preparation
+
+Tài liệu này dành cho developer đang muốn chuẩn bị nghiêm túc cho **system design interview** ở level mid đến senior.
+
+Mục tiêu không phải là học thuộc "template trả lời", mà là xây dựng tư duy kiến trúc có cấu trúc, giải thích được trade-off, và giao tiếp rõ ràng dưới áp lực phỏng vấn.
+
+> **Ngữ cảnh lộ trình:** nội dung này phù hợp nhất khi bạn đã đi qua nền tảng từ Phase 0 đến Phase 5 và đang tiến vào mindset của **Phase 6 — System Design Mastery**.
+
+---
+
+## 1) System Design Interview là gì?
+
+System Design Interview kiểm tra cách bạn tư duy khi đứng trước một bài toán hệ thống mở, thiếu dữ kiện, có nhiều ràng buộc thực tế.
+
+### Mục đích chính
+
+- Đánh giá khả năng **thiết kế hệ thống** chứ không chỉ viết code.
+- Đánh giá cách bạn ra quyết định trong điều kiện không hoàn hảo.
+- Đánh giá khả năng cân bằng giữa product, kỹ thuật, và vận hành.
+
+### Khác gì với coding interview?
+
+- Coding interview: tập trung thuật toán, correctness, implementation chi tiết.
+- System design interview: tập trung kiến trúc tổng thể, scale, reliability, trade-off, và communication.
+
+### Trọng tâm
+
+Bạn được kỳ vọng thể hiện tư duy của một kỹ sư có thể thiết kế hệ thống production, không chỉ là người hoàn thành một function.
+
+---
+
+## 2) Interviewer thực sự đánh giá điều gì?
+
+### 1. Requirement clarification
+
+- Bạn có biết hỏi đúng câu hỏi để làm rõ scope không?
+- Bạn có phân biệt functional và non-functional requirement không?
+
+### 2. Trade-off reasoning
+
+- Bạn có giải thích được vì sao chọn phương án A thay vì B?
+- Bạn có nhìn thấy chi phí vận hành và độ phức tạp đi kèm không?
+
+### 3. Scalability thinking
+
+- Bạn có biết đặt giả định về QPS, data size, growth không?
+- Bạn có biết hệ thống sẽ vỡ ở đâu khi scale tăng?
+
+### 4. Structured communication
+
+- Câu trả lời có mạch lạc, theo thứ tự, dễ follow không?
+- Bạn có chủ động dẫn dắt buổi trao đổi không?
+
+### 5. Production awareness
+
+- Bạn có nghĩ tới reliability, observability, failure handling, rollback?
+- Bạn có biết khi nào nên giữ đơn giản và khi nào phải nâng cấp kiến trúc?
+
+---
+
+## 3) Quy trình interview chuẩn (Step-by-step)
+
+### Bước 1 — Clarify requirements
+
+- Xác định rõ bài toán cốt lõi.
+- Chốt use case ưu tiên.
+- Làm rõ giới hạn: latency, consistency, availability, cost.
+
+### Bước 2 — Define scale & constraints
+
+- Ước lượng users, QPS, storage, bandwidth.
+- Xác định "điểm nóng" cần ưu tiên xử lý trước.
+
+### Bước 3 — High-level architecture
+
+- Vẽ kiến trúc mức khối lớn.
+- Xác định service chính, data flow, ranh giới trách nhiệm.
+
+### Bước 4 — Data model & API
+
+- Thiết kế entity chính, key access pattern.
+- Đề xuất API core để validate tính khả thi.
+
+### Bước 5 — Deep dive vào thành phần quan trọng
+
+- Chọn 1-2 điểm quan trọng để đào sâu: cache, queue, DB partition, consistency model...
+
+### Bước 6 — Bottleneck & failure analysis
+
+- Chỉ ra SPOF, hotspot, failure mode.
+- Nêu chiến lược giảm rủi ro và phương án dự phòng.
+
+### Bước 7 — Trade-off & evolution
+
+- Tóm tắt điểm mạnh/yếu của phương án.
+- Nêu roadmap nâng cấp hệ thống theo giai đoạn tăng trưởng.
+
+---
+
+## 4) Framework gợi ý: SNAKE
+
+Một framework ngắn gọn, dễ nhớ để bạn không bị "trôi" trong interview.
+
+### S — Scope
+
+- Bài toán là gì?
+- Use case nào ưu tiên?
+- Điều gì không nằm trong scope hôm nay?
+
+### N — Numbers
+
+- Ước lượng QPS, payload, lưu trữ, peak traffic.
+- Đặt số gần đúng để định hướng kiến trúc.
+
+### A — API
+
+- Đề xuất API cốt lõi để chốt contract giữa client/server.
+
+### K — Key Components
+
+- Dựng kiến trúc chính: LB, app, cache, DB, queue, worker, CDN...
+
+### E — Explore Deep Dive
+
+- Đào sâu 1-2 vấn đề có rủi ro cao nhất.
+- Nói rõ trade-off và kế hoạch scale tiếp theo.
+
+### Ví dụ nhanh (Design URL Shortener)
+
+- **Scope:** tạo short URL, redirect nhanh, thống kê click cơ bản.
+- **Numbers:** 50K req/s read, 5K req/s write, 5 năm dữ liệu.
+- **API:** `POST /shorten`, `GET /{code}`.
+- **Key components:** API service + KV store + cache + analytics pipeline.
+- **Explore:** collision strategy, hot key, eventual consistency cho analytics.
+
+---
+
+## 5) Các câu hỏi interview phổ biến và thứ được kiểm tra
+
+### Design Twitter / X
+
+Kiểm tra: fan-out strategy, feed generation, read/write trade-off, timeline consistency.
+
+### Design YouTube
+
+Kiểm tra: upload pipeline, transcoding, CDN strategy, metadata store, recommendation boundaries.
+
+### Design Chat System
+
+Kiểm tra: real-time delivery, connection management, ordering, offline sync, presence.
+
+### Design URL Shortener
+
+Kiểm tra: ID generation, redirect latency, hot key handling, read-heavy optimization.
+
+### Design Notification System
+
+Kiểm tra: multi-channel delivery, retry policy, deduplication, rate limiting, observability.
+
+---
+
+## 6) Cách chuẩn bị hiệu quả
+
+### Theo lộ trình học
+
+- Củng cố foundation (Phase 0-2).
+- Nâng độ sâu distributed + scale (Phase 3-4).
+- Luyện pattern thực tế và decision narrative (Phase 5-6).
+
+### Chiến lược luyện tập
+
+- 3-4 đề/tuần, mỗi đề 45-60 phút.
+- 1 buổi/tuần chỉ để review và sửa cách trình bày.
+- Luyện cả breadth (nhiều loại đề) và depth (đào sâu 1 đề).
+
+### Whiteboard / diagram practice
+
+- Vẽ nhanh kiến trúc ở mức component trước.
+- Giảm chi tiết thừa, tăng tính rõ ràng data flow.
+
+### Communication practice
+
+- Nói thành tiếng khi giải đề.
+- Ghi âm 1-2 lần/tuần để tự phát hiện điểm rối.
+
+### Mock interviews
+
+- Tập với bạn học hoặc mentor.
+- Sau mỗi buổi, chốt 3 điểm mạnh và 3 điểm cần sửa.
+
+### Học từ hệ thống thật
+
+- Đọc engineering blog (Uber, Netflix, Cloudflare, Meta...).
+- Tóm tắt lại theo khung: bài toán -> giải pháp -> trade-off -> bài học.
+
+---
+
+## 7) Các lỗi rất thường gặp
+
+- Nhảy vào giải pháp quá sớm khi chưa chốt requirement.
+- Không hỏi số liệu scale nên kiến trúc thiếu cơ sở.
+- Nói quá nhiều thành phần nhưng không giải thích trade-off.
+- Over-engineering ngay từ đầu.
+- Không phân biệt "must-have bây giờ" và "evolution sau".
+- Bỏ qua reliability, failure handling, observability.
+
+> **Checklist chống lỗi:** trước khi kết thúc, luôn tự hỏi "Nếu traffic tăng 10x, hệ thống sẽ vỡ ở đâu trước?"
+
+---
+
+## 8) Lộ trình chuẩn bị đề xuất (8 tuần)
+
+### Tuần 1-2
+
+- Ôn framework trả lời (SNAKE).
+- Luyện 4 đề cơ bản: URL shortener, rate limiter, notification, chat basic.
+
+### Tuần 3-4
+
+- Tăng độ sâu distributed systems: consistency, partition, queue, cache invalidation.
+- Luyện 4 đề trung bình: feed, file storage, search basic, analytics pipeline.
+
+### Tuần 5-6
+
+- Tập medium-hard: YouTube, ride-hailing dispatch overview, ad serving overview.
+- Tập bottleneck/failure analysis kỹ hơn.
+
+### Tuần 7
+
+- Mock interview cường độ cao: 3-4 buổi/tuần.
+- Chấm theo rubric: clarity, structure, trade-off, depth.
+
+### Tuần 8
+
+- Final review: top lỗi cá nhân, top pattern cần nhớ, top câu hỏi clarifying.
+- Giảm tải trước interview, tập trung vào sự rõ ràng và bình tĩnh.
+
+---
+
+## 9) Communication tips trong interview
+
+### Think aloud có cấu trúc
+
+Nói rõ bạn đang làm bước nào: requirement -> numbers -> architecture -> deep dive -> trade-off.
+
+### Dẫn dắt cuộc trao đổi
+
+- Chủ động đề xuất giả định khi thiếu dữ liệu.
+- Thường xuyên checkpoint: "Anh/chị muốn em đào sâu phần nào tiếp theo?"
+
+### Hỏi câu hỏi tốt
+
+- Peak traffic hay average?
+- Ưu tiên latency hay consistency?
+- MVP trước hay long-term scale trước?
+
+### Khi gặp bài toán chưa từng làm
+
+- Bình tĩnh quay về nguyên lý gốc.
+- Chia nhỏ bài toán.
+- Chọn baseline đơn giản trước rồi mở rộng.
+
+---
+
+## 10) Bắt đầu ngay
+
+Nếu bạn muốn chuẩn bị system design interview một cách bài bản:
+
+- Hoàn thành các phase nền tảng nếu còn thiếu.
+- Vào **Phase 6 — System Design Mastery** để luyện khung tư duy interview.
+- Lên lịch mock interview định kỳ từ tuần này.
+
