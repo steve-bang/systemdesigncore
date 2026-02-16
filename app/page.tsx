@@ -5,6 +5,7 @@ import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { Timeline } from "@/components/Timeline";
 import { PHASES } from "@/lib/site";
+import { Route } from "next";
 
 const trustSignals = [
   "Học theo lộ trình chuẩn interview",
@@ -36,7 +37,7 @@ export default function HomePage() {
                     Xem lộ trình học
                     <ArrowRight className="h-5 w-5" />
                   </Button>
-                  <Button href="/docs/getting-started" variant="ghost" size="lg">
+                  <Button href={"/docs/getting-started" as Route} variant="ghost" size="lg">
                     <PlayCircle className="h-5 w-5" />
                     Bắt đầu ngay
                   </Button>
@@ -113,7 +114,7 @@ export default function HomePage() {
                 <h2 className="section-title">Sẵn sàng bắt đầu phase đầu tiên?</h2>
                 <p className="section-subtitle">Chọn phase phù hợp để học theo nhịp riêng của bạn và theo dõi tiến độ từng bước.</p>
               </div>
-              <Button href="/phase/phase-0" size="lg">
+              <Button href={"/phase/phase-0" as Route} size="lg">
                 Vào Phase 0
                 <ArrowRight className="h-5 w-5" />
               </Button>

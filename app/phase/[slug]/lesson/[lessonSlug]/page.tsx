@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Route } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
@@ -131,7 +131,7 @@ export default async function PhaseLessonPage({ params }: { params: Promise<{ sl
 
               <PhaseLessonNav phase={phase} />
 
-              <Button href={`/phase/${phase.slug}`} className="w-full" variant="ghost">
+              <Button href={`/phase/${phase.slug}` as Route} className="w-full" variant="ghost">
                 <ArrowLeft className="h-4 w-4" />
                 Tổng quan phase
               </Button>
@@ -143,7 +143,7 @@ export default async function PhaseLessonPage({ params }: { params: Promise<{ sl
                 description="The lesson may have been removed or the link is incorrect."
                 actions={
                   <>
-                    <Button href={`/phase/${phase.slug}`} variant="ghost" aria-label="Back to phase overview">
+                    <Button href={`/phase/${phase.slug}` as Route} variant="ghost" aria-label="Back to phase overview">
                       Back to phase overview
                     </Button>
                     <Button href="/roadmap" aria-label="Back to roadmap">
@@ -183,7 +183,7 @@ export default async function PhaseLessonPage({ params }: { params: Promise<{ sl
 
             <PhaseLessonNav phase={phase} activeLessonSlug={lesson.slug} />
 
-            <Button href={`/phase/${phase.slug}`} className="w-full" variant="ghost">
+            <Button href={`/phase/${phase.slug}` as Route} className="w-full" variant="ghost">
               <ArrowLeft className="h-4 w-4" />
               Tổng quan phase
             </Button>
@@ -227,7 +227,7 @@ export default async function PhaseLessonPage({ params }: { params: Promise<{ sl
                   description="Nội dung chi tiết của bài học này đang được cập nhật. Bạn vẫn có thể xem mô tả và tiếp tục điều hướng sang các bài liên quan."
                   actions={
                     <>
-                      <Button href={`/phase/${phase.slug}`} variant="ghost" aria-label="Back to phase overview">
+                      <Button href={`/phase/${phase.slug}` as Route} variant="ghost" aria-label="Back to phase overview">
                         Back to phase overview
                       </Button>
                       <Button href="/roadmap" aria-label="Back to roadmap">

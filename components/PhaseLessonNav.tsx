@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { PhaseContent } from "@/lib/content";
+import type { Route } from "next";
+
 
 type PhaseLessonNavProps = {
   phase: PhaseContent;
@@ -17,7 +19,7 @@ export function PhaseLessonNav({ phase, activeLessonSlug }: PhaseLessonNavProps)
       ) : (
         <ul className="mt-4 space-y-3">
           {phase.lessons.map((lesson, index) => {
-            const href = `/phase/${phase.slug}/lesson/${lesson.slug}`;
+            const href = `/phase/${phase.slug}/lesson/${lesson.slug}` as Route;
             const isActive = activeLessonSlug === lesson.slug;
             const cardClasses = cn(
               "block rounded-xl border border-line bg-surface-soft p-3 transition",

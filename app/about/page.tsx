@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Route } from "next";
 import { ArrowRight, HeartHandshake, Lightbulb, Target } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
@@ -146,7 +146,7 @@ export default function AboutPage() {
                   Bắt đầu lộ trình học
                   <ArrowRight className="h-4 w-4" />
                 </Button>
-                <Button href="/docs/getting-started" size="lg" variant="ghost">
+                <Button href={"/docs/getting-started" as Route} size="lg" variant="ghost">
                   Xem hướng dẫn học
                 </Button>
               </div>

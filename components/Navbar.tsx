@@ -50,7 +50,7 @@ export function Navbar() {
           </nav>
 
           <div className="hidden md:block">
-            <Button href="/docs/getting-started" size="md">
+            <Button href={"/docs/getting-started" as Route} size="md">
               Bắt đầu học
             </Button>
           </div>
@@ -73,7 +73,7 @@ export function Navbar() {
                   {item.label}
                 </Link>
               ))}
-              <Button href="/docs/getting-started" className="mt-2 w-full" onClick={() => setOpen(false)}>
+              <Button href={"/docs/getting-started" as Route} className="mt-2 w-full" onClick={() => setOpen(false)}>
                 Bắt đầu học
               </Button>
             </nav>

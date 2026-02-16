@@ -1,6 +1,7 @@
 import { Heart, ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { PhaseContent } from "@/lib/content";
+import { Route } from "next";
 
 type LessonMeta = PhaseContent["lessons"][number];
 
@@ -29,14 +30,14 @@ export function LessonNavigation({
     <div className="mt-10 border-t border-line pt-6">
       <div className="flex flex-wrap gap-3">
         {previousLesson ? (
-          <Button href={`/phase/${phaseSlug}/lesson/${previousLesson.slug}`} variant="ghost">
+          <Button href={`/phase/${phaseSlug}/lesson/${previousLesson.slug}` as Route} variant="ghost">
             <ArrowLeft className="h-4 w-4" />
             {previousLesson.title}
           </Button>
         ) : null}
 
         {nextLesson ? (
-          <Button href={`/phase/${phaseSlug}/lesson/${nextLesson.slug}`} className="ml-auto">
+          <Button href={`/phase/${phaseSlug}/lesson/${nextLesson.slug}` as Route} className="ml-auto">
             {nextLesson.title}
             <ArrowRight className="h-4 w-4" />
           </Button>
@@ -45,7 +46,7 @@ export function LessonNavigation({
 
       {showNextPhaseCta && nextPhase ? (
         <Button
-          href={`/phase/${nextPhase.slug}`}
+          href={`/phase/${nextPhase.slug}` as Route}
           size="lg"
           className="mt-4 w-full justify-between bg-gradient-to-r from-brand to-[#5f7dff] px-6 shadow-[0_16px_34px_rgba(47,107,255,0.35)] hover:from-[#2659d6] hover:to-[#4f69dc]"
         >
@@ -59,7 +60,7 @@ export function LessonNavigation({
 
       {showDonationCta ? (
         <Button
-          href={donationUrl}
+          href={donationUrl  as Route}
           target="_blank"
           rel="noreferrer"
           size="lg"

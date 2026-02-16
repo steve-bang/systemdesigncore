@@ -1,6 +1,8 @@
 import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import type { Route } from "next";
+
 
 type BaseProps = {
   children: ReactNode;
@@ -10,7 +12,7 @@ type BaseProps = {
 };
 
 type ButtonProps = BaseProps & ButtonHTMLAttributes<HTMLButtonElement> & { asChild?: false; href?: never };
-type LinkButtonProps = BaseProps & AnchorHTMLAttributes<HTMLAnchorElement> & { href: string; asChild?: false };
+type LinkButtonProps = BaseProps & AnchorHTMLAttributes<HTMLAnchorElement> & { href: Route; asChild?: false };
 
 type Props = ButtonProps | LinkButtonProps;
 
@@ -28,7 +30,7 @@ export function Button({ className, variant = "primary", size = "md", children, 
     const { href, ...linkProps } = props;
 
     return (
-      <Link href={href} className={classes} {...linkProps}>
+      <Link href={href as Route} className={classes} {...linkProps}>
         {children}
       </Link>
     );

@@ -137,7 +137,7 @@ Questions cụ thể:
 **Tại sao quan trọng:** Latency requirements drive caching strategy, database indexing, và CDN usage.
 ```mermaid
 flowchart LR
-    A[User Request] -->|Target: <100ms| B[CDN Cache]
+    A[User Request] -->|Target: &lt;100ms| B[CDN Cache]
     B -->|Cache Miss| C[Application Cache]
     C -->|Cache Miss| D[Database]
     
@@ -147,9 +147,9 @@ flowchart LR
 ```
 
 Ví dụ:
-- Search engine: <100ms critical cho UX
+- Search engine: &lt;100ms critical cho UX
 - Batch report generation: vài phút OK
-- Real-time chat: <500ms expected
+- Real-time chat: &lt;500ms expected
 - Analytics dashboard: 2-3 seconds acceptable
 
 P99 latency quan trọng hơn average. Nếu 99% requests nhanh nhưng 1% slow, user experience vẫn tệ.
@@ -221,7 +221,7 @@ Qua kinh nghiệm, đây là những lỗi phổ biến:
 
 **3. Không challenge unrealistic requirements**
 
-Nếu user muốn: strong consistency + 99.999% availability + <10ms latency + $100/month budget → không realistic. Bạn phải point out và discuss trade-offs.
+Nếu user muốn: strong consistency + 99.999% availability + &lt;10ms latency + $100/month budget → không realistic. Bạn phải point out và discuss trade-offs.
 
 **4. Quên hỏi về constraints**
 
@@ -253,8 +253,8 @@ Nếu user muốn: strong consistency + 99.999% availability + <10ms latency + $
 - Strong consistency for URL creation (no duplicates)
 
 **Latency:**
-- Redirects: <100ms critical
-- Creation: <500ms OK
+- Redirects: &lt;100ms critical
+- Creation: &lt;500ms OK
 
 **Cost:**
 - Startup budget: optimize for cost
