@@ -7,12 +7,20 @@ import { Menu, X } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import type { Route } from "next";
+
+export const routes = {
+  roadmap: "/roadmap" as Route,
+  docs: "/docs/getting-started" as Route,
+  about: "/about" as Route
+};
 
 const navItems = [
-  { href: "/roadmap", label: "Roadmap" },
-  { href: "/docs/getting-started", label: "Docs" },
-  { href: "/about", label: "About" }
+  { href: routes.roadmap, label: "Roadmap" },
+  { href: routes.docs, label: "Docs" },
+  { href: routes.about, label: "About" }
 ];
+
 
 export function Navbar() {
   const pathname = usePathname();
