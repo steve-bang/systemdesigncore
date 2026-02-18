@@ -52,7 +52,13 @@ export function ShareButton({ path, title, description, className }: ShareButton
       return path;
     }
 
-    return getCanonicalUrl() ?? new URL(path, window.location.origin).toString();
+    // if path provided → build from origin
+    if (path) {
+      return new URL(path, window.location.origin).toString();
+    }
+
+    // fallback → current page
+    return window.location.href;
   }, [path]);
 
   useEffect(() => {
@@ -173,9 +179,8 @@ export function ShareButton({ path, title, description, className }: ShareButton
       <div
         role="menu"
         aria-label="Tùy chọn chia sẻ"
-        className={`absolute left-0 right-0 top-full z-30 mt-2 w-full origin-top rounded-xl border border-line bg-surface p-2 shadow-[0_16px_32px_rgba(14,21,40,0.12)] transition-all duration-150 sm:left-auto sm:right-0 sm:w-64 sm:origin-top-right ${
-          isOpen ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0"
-        }`}
+        className={`absolute left-0 right-0 top-full z-30 mt-2 w-full origin-top rounded-xl border border-line bg-surface p-2 shadow-[0_16px_32px_rgba(14,21,40,0.12)] transition-all duration-150 sm:left-auto sm:right-0 sm:w-64 sm:origin-top-right ${isOpen ? "translate-y-0 opacity-100" : "pointer-events-none -translate-y-1 opacity-0"
+          }`}
       >
         <div className="mb-1 flex items-center justify-between px-2 py-1">
           <p className="text-xs font-medium text-ink-dim">Chia sẻ bài học</p>
